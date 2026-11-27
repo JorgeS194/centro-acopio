@@ -1,0 +1,244 @@
+@host = https://localhost:7001
+
+### 01 Productos - listar (esperado: 200, lista de productos)
+GET {{host}}/api/productos
+
+### 02 Productos - filtrar tipo válido (esperado: 200, solo productos Ropa)
+GET {{host}}/api/productos?tipo=Ropa
+
+### 03 Productos - crear válido (esperado: 201, producto creado)
+POST {{host}}/api/productos
+Content-Type: application/json
+
+{"nombre":"Producto HTTP nuevo","tipo":"Alimentos"}
+
+### 04 Productos - nombre duplicado (esperado: 409, Conflicto)
+POST {{host}}/api/productos
+Content-Type: application/json
+
+{"nombre":"Arroz","tipo":"Alimentos"}
+
+### 05 Productos - tipo inválido (esperado: 400, error de validación)
+POST {{host}}/api/productos
+Content-Type: application/json
+
+{"nombre":"Producto inválido","tipo":"Juguetes"}
+
+### 06 Productos - editar producto nuevo sin movimientos (esperado: 204, sin cuerpo)
+PUT {{host}}/api/productos/9
+Content-Type: application/json
+
+{"nombre":"Producto HTTP nuevo editado","tipo":"Alimentos"}
+
+### 07 Productos - id de ruta inexistente (esperado: 404)
+GET {{host}}/api/productos/99999
+
+### 08 Productos - eliminar con movimientos (esperado: 409, Conflicto)
+DELETE {{host}}/api/productos/1
+
+### 09 Productos - eliminar sin movimientos (esperado: 204, sin cuerpo)
+DELETE {{host}}/api/productos/9
+
+### 10 Donantes - crear válido (esperado: 201, donante creado)
+POST {{host}}/api/donantes
+Content-Type: application/json
+
+{"cedula":"8-987-654","nombre":"Juan Pérez","telefono":"61234567"}
+
+### 11 Donantes - cédula inválida (esperado: 400, formato inválido)
+POST {{host}}/api/donantes
+Content-Type: application/json
+
+{"cedula":"cedula-mala","nombre":"Juan Pérez","telefono":"61234567"}
+
+### 12 Donantes - cédula duplicada (esperado: 409, Conflicto)
+POST {{host}}/api/donantes
+Content-Type: application/json
+
+{"cedula":"8-123-456","nombre":"Juan Pérez","telefono":"61234567"}
+
+### 13 Donantes - teléfono inválido (esperado: 400, 7 u 8 dígitos)
+POST {{host}}/api/donantes
+Content-Type: application/json
+
+{"cedula":"8-987-653","nombre":"Juan Pérez","telefono":"12AB"}
+
+### 14 Donantes - eliminar con donaciones (esperado: 409, Conflicto)
+DELETE {{host}}/api/donantes/1
+
+### 15 Beneficiarios - crear con dirección (esperado: 201, beneficiario creado)
+POST {{host}}/api/beneficiarios
+Content-Type: application/json
+
+{"cedula":"8-456-789","nombre":"Lucía Gómez","telefono":"63334455","direccion":"Calle Central"}
+
+### 16 Beneficiarios - crear sin dirección (esperado: 201, dirección null)
+POST {{host}}/api/beneficiarios
+Content-Type: application/json
+
+{"cedula":"8-456-788","nombre":"Mario Gómez","telefono":"63334456","direccion":null}
+
+### 17 Beneficiarios - cédula inválida (esperado: 400, formato inválido)
+POST {{host}}/api/beneficiarios
+Content-Type: application/json
+
+{"cedula":"cedula-mala","nombre":"Lucía Gómez","telefono":"63334455"}
+
+### 18 Beneficiarios - cédula duplicada (esperado: 409, Conflicto)
+POST {{host}}/api/beneficiarios
+Content-Type: application/json
+
+{"cedula":"8-234-567","nombre":"Lucía Gómez","telefono":"63334455"}
+
+### 19 Beneficiarios - eliminar con entregas (esperado: 409, Conflicto)
+DELETE {{host}}/api/beneficiarios/1
+
+### 20 Donaciones - alimento válido (esperado: 201, donación creada)
+POST {{host}}/api/donaciones
+Content-Type: application/json
+
+{"productoId":1,"donanteId":1,"descripcion":"Donación de alimentos","cantidad":5,"talla":null,"grupoEdad":null,"sexo":null}
+
+### 21 Donaciones - ropa completa (esperado: 201, donación creada)
+POST {{host}}/api/donaciones
+Content-Type: application/json
+
+{"productoId":5,"donanteId":2,"descripcion":"Camisas de prueba","cantidad":3,"talla":"M","grupoEdad":"Adulto","sexo":"Mujer"}
+
+### 22 Donaciones - anónima (esperado: 201, donanteId null)
+POST {{host}}/api/donaciones
+Content-Type: application/json
+
+{"productoId":1,"donanteId":null,"descripcion":"Aporte anónimo de prueba","cantidad":2,"talla":null,"grupoEdad":null,"sexo":null}
+
+### 23 Donaciones - ropa sin talla (esperado: 400, faltan datos de ropa)
+POST {{host}}/api/donaciones
+Content-Type: application/json
+
+{"productoId":5,"donanteId":1,"descripcion":"Ropa incompleta","cantidad":2,"talla":null,"grupoEdad":"Adulto","sexo":"Mujer"}
+
+### 24 Donaciones - alimento con talla (esperado: 400, campos de ropa deben ser null)
+POST {{host}}/api/donaciones
+Content-Type: application/json
+
+{"productoId":1,"donanteId":1,"descripcion":"Alimento con talla","cantidad":2,"talla":"M","grupoEdad":"Adulto","sexo":"Mujer"}
+
+### 25 Donaciones - descripción inválida (esperado: 400)
+POST {{host}}/api/donaciones
+Content-Type: application/json
+
+{"productoId":1,"donanteId":1,"descripcion":"x","cantidad":2,"talla":null,"grupoEdad":null,"sexo":null}
+
+### 26 Donaciones - cantidad 0 (esperado: 400)
+POST {{host}}/api/donaciones
+Content-Type: application/json
+
+{"productoId":1,"donanteId":1,"descripcion":"Cantidad fuera de rango","cantidad":0,"talla":null,"grupoEdad":null,"sexo":null}
+
+### 27 Donaciones - cantidad 10001 (esperado: 400)
+POST {{host}}/api/donaciones
+Content-Type: application/json
+
+{"productoId":1,"donanteId":1,"descripcion":"Cantidad fuera de rango","cantidad":10001,"talla":null,"grupoEdad":null,"sexo":null}
+
+### 28 Donaciones - producto inexistente (esperado: 400, id inválido en cuerpo)
+POST {{host}}/api/donaciones
+Content-Type: application/json
+
+{"productoId":99999,"donanteId":1,"descripcion":"Producto inexistente","cantidad":1,"talla":null,"grupoEdad":null,"sexo":null}
+
+### 29 Donaciones - filtrar por tipo y donante (esperado: 200)
+GET {{host}}/api/donaciones?tipo=Ropa&productoId=5&donanteId=1
+
+### 30 Donaciones - editar id inexistente (esperado: 404)
+PUT {{host}}/api/donaciones/99999
+Content-Type: application/json
+
+{"productoId":1,"donanteId":1,"descripcion":"Edición inexistente","cantidad":1,"talla":null,"grupoEdad":null,"sexo":null}
+
+### 31 Donaciones - eliminar dejando stock negativo (esperado: 409)
+DELETE {{host}}/api/donaciones/1
+
+### 32 Entregas - entregar exactamente el disponible (esperado: 201)
+POST {{host}}/api/entregas
+Content-Type: application/json
+
+{"beneficiarioId":1,"productoId":1,"cantidad":57,"talla":null,"grupoEdad":null,"sexo":null}
+
+### 33 Entregas - una unidad más que el disponible (esperado: 409, incluye disponible)
+POST {{host}}/api/entregas
+Content-Type: application/json
+
+{"beneficiarioId":1,"productoId":1,"cantidad":1,"talla":null,"grupoEdad":null,"sexo":null}
+
+### 34 Entregas - artículo nunca donado (esperado: 409, disponible 0)
+POST {{host}}/api/entregas
+Content-Type: application/json
+
+{"beneficiarioId":1,"productoId":8,"cantidad":1,"talla":null,"grupoEdad":null,"sexo":null}
+
+### 35 Entregas - ropa en clave de stock existente (esperado: 201)
+POST {{host}}/api/entregas
+Content-Type: application/json
+
+{"beneficiarioId":1,"productoId":5,"cantidad":1,"talla":"M","grupoEdad":"Adulto","sexo":"Mujer"}
+
+### 36 Entregas - beneficiario inexistente (esperado: 400)
+POST {{host}}/api/entregas
+Content-Type: application/json
+
+{"beneficiarioId":99999,"productoId":1,"cantidad":1,"talla":null,"grupoEdad":null,"sexo":null}
+
+### 37 Entregas - editar cantidad bajando (esperado: 204)
+PUT {{host}}/api/entregas/1
+Content-Type: application/json
+
+{"beneficiarioId":1,"productoId":1,"cantidad":5,"talla":null,"grupoEdad":null,"sexo":null}
+
+### 38 Entregas - editar cantidad subiendo sin superar stock (esperado: 204)
+PUT {{host}}/api/entregas/1
+Content-Type: application/json
+
+{"beneficiarioId":1,"productoId":1,"cantidad":10,"talla":null,"grupoEdad":null,"sexo":null}
+
+### 39 Entregas - eliminar y devolver stock (esperado: 204)
+DELETE {{host}}/api/entregas/1
+
+### 40 Inventario - todos (esperado: 200)
+GET {{host}}/api/inventario
+
+### 41 Inventario - solo Ropa (esperado: 200)
+GET {{host}}/api/inventario?tipo=Ropa
+
+### 42 Inventario - tipo inválido (esperado: 400)
+GET {{host}}/api/inventario?tipo=Juguetes
+
+### 43 Reportes - totales por tipo (esperado: 200, siempre tres tipos)
+GET {{host}}/api/reportes/totales-por-tipo
+
+### 44 Reportes - donaciones por tipo válido (esperado: 200)
+GET {{host}}/api/reportes/donaciones-por-tipo?tipo=Alimentos
+
+### 45 Reportes - donaciones por tipo faltante (esperado: 400)
+GET {{host}}/api/reportes/donaciones-por-tipo
+
+### 46 Reportes - ropa sin filtros (esperado: 200)
+GET {{host}}/api/reportes/ropa
+
+### 47 Reportes - ropa talla XS y sexo Hombre (esperado: 200)
+GET {{host}}/api/reportes/ropa?talla=XS&sexo=Hombre
+
+### 48 Reportes - movimientos sin fechas (esperado: 200)
+GET {{host}}/api/reportes/movimientos
+
+### 49 Reportes - movimientos con rango inclusivo (esperado: 200)
+GET {{host}}/api/reportes/movimientos?desde=2026-11-20&hasta=2026-11-22
+
+### 50 Reportes - desde posterior a hasta (esperado: 400)
+GET {{host}}/api/reportes/movimientos?desde=2026-11-23&hasta=2026-11-22
+
+### 51 Donaciones - editar y dejar stock negativo (esperado: 409, Conflicto)
+PUT {{host}}/api/donaciones/1
+Content-Type: application/json
+
+{"productoId":1,"donanteId":1,"descripcion":"Edición dejaría stock negativo","cantidad":1,"talla":null,"grupoEdad":null,"sexo":null}

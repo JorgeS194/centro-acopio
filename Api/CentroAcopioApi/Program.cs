@@ -1,4 +1,7 @@
 using CentroAcopioApi.Exceptions;
+using CentroAcopioApi.Data;
+using CentroAcopioApi.Exceptions;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -9,6 +12,10 @@ builder.Services.AddOpenApi();
 
 // Respuestas de error con formato estándar (ProblemDetails).
 builder.Services.AddProblemDetails();
+
+// El DbContext generado, con la cadena de conexión de appsettings.Development.json.
+builder.Services.AddDbContext<CentroAcopioDbContext>(opciones =>
+    opciones.UseSqlServer(builder.Configuration.GetConnectionString("CentroAcopioDb")));
 
 // --- Servicios de Jorge: Productos, Donaciones, Stock ---
 // --- Servicios de Moisés: Donantes, Beneficiarios, Entregas ---
